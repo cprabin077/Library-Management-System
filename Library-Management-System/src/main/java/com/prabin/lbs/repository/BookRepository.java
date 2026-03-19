@@ -17,21 +17,24 @@ public interface BookRepository extends JpaRepository<BookModal, Long> {
 
 	boolean existsByIsbn(String isbn);
 	
-	@Query(
-			"select b from BookModal b where " + 
-			":searchTerm is null OR"+
-			"lower(b.title) like lower(concat('%', :searchTerm, '%')) OR "+
-			"lower(b.author) like lower(concat('%', :searchTerm, '%')) OR "+
-			"lower(b.isbn) like lower(concat('%', :searchTerm, '%')) OR "+
-			"(:genreId is null or b.genre.id=genreId) AND " + 
-			"(:availableOnly== fasle OR b.availableCopies > 0) AND " + 
-			"b.active=true"
+	@Query("""
+			SELECT b FROM BookModal b 
+			WHERE 
+			(
+			    :searchTerm IS NULL OR 
+			    lower(b.title) LIKE lower(concat('%', :searchTerm, '%')) OR 
+			    lower(b.author) LIKE lower(concat('%', :searchTerm, '%')) OR 
+			    lower(b.isbn) LIKE lower(concat('%', :searchTerm, '%'))
 			)
-	Page<BookModal> searchBookWithFilters(
-			@Param("searchTerm") String searchTerm,
-			@Param("genreId") Long genreId, 
-			@Param("availableOnly") boolean availableOnly, 
-			Pageable pageable
+			AND (:genreId IS NULL OR b.genreModal.id = :genreId)
+			AND (:availableOnly = false OR b.availableCopies > 0)
+			AND b.active = true
+			""")
+			Page<BookModal> searchBookWithFilters(
+			        @Param("searchTerm") String searchTerm,
+			        @Param("genreId") Long genreId,
+			        @Param("availableOnly") boolean availableOnly,
+			        Pageable pageable
 			);
 	
 	long countByActiveTrue();

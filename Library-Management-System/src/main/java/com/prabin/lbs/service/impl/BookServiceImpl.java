@@ -104,12 +104,15 @@ public class BookServiceImpl implements BookService{
 				searchRequest.getSize(),
 				searchRequest.getSortBy(),
 				searchRequest.getSortDirection());
+		
+		boolean availableOnly = Boolean.TRUE.equals(searchRequest.getAvailableOnly());
+
 		Page<BookModal> bookPage = bookRepository.searchBookWithFilters(
-				searchRequest.getSearchTerm(),
-				searchRequest.getGenreId(),
-				searchRequest.getAvailableOnly(),
-				pageable
-				);
+		        searchRequest.getSearchTerm(),
+		        searchRequest.getGenreId(),
+		        availableOnly,
+		        pageable
+		);
 		return convertToPageResponse(bookPage);
 	}
 
