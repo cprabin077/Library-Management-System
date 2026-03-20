@@ -1,11 +1,14 @@
 package com.prabin.lbs.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 import com.prabin.lbs.configurations.JwtProvider;
 import com.prabin.lbs.domain.UserRole;
 import com.prabin.lbs.exception.UserException;
+import com.prabin.lbs.mapper.UserMapper;
 import com.prabin.lbs.modal.UserModal;
 import com.prabin.lbs.payload.dto.UserDTO;
 import com.prabin.lbs.payload.response.AuthResponse;
@@ -27,11 +31,44 @@ public class AuthServiceImpl implements AuthService {
 
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final JwtProvider jwtProvider;
+	private final CustomUserServiceImpl customUserServiceImpl;
+	// private final UserMapper userMapper;
 
 	@Override
-	public AuthResponse login(String username, String password) {
-		// TODO Auto-generated method stub
-		return null;
+	public AuthResponse login(String username, String password) throws UserException {
+		Authentication authentication = authenticate(username, password);
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+//		Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+//		String role = authorities.iterator().next().getAuthority();
+		String token = jwtProvider.generateToken(authentication);
+		
+		UserModal userModal = userRepository.findByEmail(username);
+		
+		//update last login
+		userModal.setLastLogin(LocalDateTime.now());
+		userRepository.save(userModal);
+		
+		AuthResponse response = new AuthResponse();
+		response.setTitle("Login Success");
+		response.setMessage("welcome Back"+ username);
+		response.setJwt(token);
+		response.setUser(UserMapper.toDTO(userModal));
+		
+		return response;
+	}
+
+	private Authentication authenticate(String username, String password) throws UserException {
+		UserDetails userDetails = customUserServiceImpl.loadUserByUsername(username);
+		
+		if(userDetails == null) {
+			throw new UserException("User not found with email - "+ password);
+		}
+		if(!passwordEncoder.matches(password, userDetails.getPassword())) {
+			throw new UserException("Password not matched");
+		}
+		return new UsernamePasswordAuthenticationToken(password, userDetails.getPassword());
+	
 	}
 
 	@Override
@@ -63,14 +100,14 @@ public class AuthServiceImpl implements AuthService {
 		response.setJwt(jwt);
 		response.setTitle("Welcome "+ createdUser.getFullName());
 		response.setMessage("Registered successfully");
-		response.setUser(user);
-		return null;
+		response.setUser(UserMapper.toDTO(savedUser));
+		
+		return response;
 	}
 
 	@Override
 	public void createPasswordResetToken(String email) {
-		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
