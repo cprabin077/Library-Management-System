@@ -2,6 +2,7 @@ package com.prabin.lbs.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.UUID;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,9 +18,11 @@ import com.prabin.lbs.configurations.JwtProvider;
 import com.prabin.lbs.domain.UserRole;
 import com.prabin.lbs.exception.UserException;
 import com.prabin.lbs.mapper.UserMapper;
+import com.prabin.lbs.modal.PasswordResetToken;
 import com.prabin.lbs.modal.UserModal;
 import com.prabin.lbs.payload.dto.UserDTO;
 import com.prabin.lbs.payload.response.AuthResponse;
+import com.prabin.lbs.repository.PasswordResetTokenRepository;
 import com.prabin.lbs.repository.UserRepository;
 import com.prabin.lbs.service.AuthService;
 
@@ -30,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthServiceImpl implements AuthService {
 
 	private final UserRepository userRepository;
+	private final PasswordResetTokenRepository passwordResetTokenRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtProvider jwtProvider;
 	private final CustomUserServiceImpl customUserServiceImpl;
@@ -106,8 +110,29 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public void createPasswordResetToken(String email) {
+	public void createPasswordResetToken(String email) throws UserException {
 		
+		String frontendUrl = "";
+		UserModal userModal = userRepository.findByEmail(email);
+		
+		if(userModal == null) {
+			throw new UserException("User not found with given email");
+		}
+		
+		String token = UUID.randomUUID().toString();
+		
+		PasswordResetToken resetToken = PasswordResetToken.builder()
+			.token(token)
+			.userModal(userModal)
+			.expiryDate(LocalDateTime.now().plusMinutes(5))
+			.build();
+		
+		passwordResetTokenRepository.save(resetToken);
+		String resetLink = frontendUrl + token;
+		String subject = "Password Reset Request";
+		String bdy = "You requested to reset your password. Use this link(valid for 5 minutes only):" + resetLink;
+		
+		// Sent email
 	}
 
 	@Override
