@@ -16,25 +16,39 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
 @Service
-
 public class JwtProvider {
-	SecretKey key = Keys.hmacShaKeyFor(JwtConstant.SECRET_KEY.getBytes());
 
-	public String generateToken(Authentication authentication) {
+    SecretKey key = Keys.hmacShaKeyFor(JwtConstant.SECRET_KEY.getBytes());
 
-		Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-		String roles = populateAuthorities(authorities);
-		return Jwts.builder().issuedAt(new Date()).expiration(new Date(new Date().getTime() + 86400000))
-				.claim("email", authentication.getName()).claim("authorities", roles).signWith(key).compact();
-	}
+    public String generateToken(Authentication authentication) {
 
-	public String getEmailFromJwtToken(String jwt) {
-		jwt = jwt.substring(7);
-		Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(jwt).getPayload();
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        String roles = populateAuthorities(authorities);
 
-		return String.valueOf(claims.get("email"));
+        return Jwts.builder()
+                .issuedAt(new Date())
+                .expiration(new Date(new Date().getTime() + 86400000))
+                .claim("email", authentication.getName())
+                .claim("authorities", roles)
+                .signWith(key)
+                .compact();
+    }
 
-	}
+    public String getEmailFromJwtToken(String jwt) {
+
+        if (jwt.startsWith("Bearer ")) {
+            jwt = jwt.substring(7);
+        }
+
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(jwt)
+                .getPayload();
+
+        return String.valueOf(claims.get("email"));
+    }
+
 
 	private String populateAuthorities(Collection<? extends GrantedAuthority> authorities) {
 		Set<String> auths = new HashSet<>();
