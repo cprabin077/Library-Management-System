@@ -21,35 +21,28 @@ import jakarta.servlet.http.HttpServletRequest;
 public class SecurityConfig {
 
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-		return http
-				.sessionManagement(management->management.sessionCreationPolicy(
-						SessionCreationPolicy.STATELESS))
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		return http.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(Authorize -> Authorize
-						.requestMatchers("/api/**").authenticated()
+
 						.requestMatchers("/api/admin/**").hasRole("ADMIN")
-						.anyRequest().permitAll()
-						)
+						.requestMatchers("/api/**").authenticated()
+						.anyRequest().permitAll())
+				
 				.addFilterBefore(new JwtValidator(), BasicAuthenticationFilter.class)
-				.csrf(AbstractHttpConfigurer::disable)
-				.cors(cors->cors.configurationSource(corsConfigurationSource()))
+				.csrf(AbstractHttpConfigurer::disable).cors(cors -> cors.configurationSource(corsConfigurationSource()))
 				.build();
 	}
 
 	private CorsConfigurationSource corsConfigurationSource() {
-		
+
 		return new CorsConfigurationSource() {
-			
+
 			@Override
 			public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
 				CorsConfiguration cfg = new CorsConfiguration();
 				cfg.setAllowCredentials(true);
-				cfg.setAllowedOrigins(
-						Arrays.asList(
-								"http://localhost:5173/",
-								"https://prabinlibaray.com"
-								)
-						);
+				cfg.setAllowedOrigins(Arrays.asList("http://localhost:5173/", "https://prabinlibaray.com"));
 				cfg.setAllowedMethods(Collections.singletonList("*"));
 				cfg.setAllowedHeaders(Collections.singletonList("*"));
 				cfg.setExposedHeaders(Collections.singletonList("Authorization"));
@@ -58,7 +51,7 @@ public class SecurityConfig {
 			}
 		};
 	}
-	
+
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();

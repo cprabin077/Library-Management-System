@@ -28,6 +28,7 @@ public class UserDTO {
 	
 	private UserRole role;
 	
+	private String username;
 	
 	private LocalDateTime lastLogin;
 
