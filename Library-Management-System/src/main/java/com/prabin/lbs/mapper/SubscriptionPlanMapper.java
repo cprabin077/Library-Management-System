@@ -1,8 +1,11 @@
 package com.prabin.lbs.mapper;
 
+import org.springframework.stereotype.Component;
+
 import com.prabin.lbs.modal.SubscriptionPlan;
 import com.prabin.lbs.payload.dto.SubscriptionPlanDTO;
 
+@Component
 public class SubscriptionPlanMapper {
 	
 	public SubscriptionPlanDTO toDTO(SubscriptionPlan plan) {
