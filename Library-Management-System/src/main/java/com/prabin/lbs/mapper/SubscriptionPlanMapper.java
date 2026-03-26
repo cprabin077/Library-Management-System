@@ -7,12 +7,12 @@ import com.prabin.lbs.payload.dto.SubscriptionPlanDTO;
 
 @Component
 public class SubscriptionPlanMapper {
-	
+
 	public SubscriptionPlanDTO toDTO(SubscriptionPlan plan) {
-		if(plan==null) {
+		if (plan == null) {
 			return null;
 		}
-		
+
 		SubscriptionPlanDTO dto = new SubscriptionPlanDTO();
 		dto.setId(plan.getId());
 		dto.setPlanCode(plan.getPlanCode());
@@ -33,14 +33,14 @@ public class SubscriptionPlanMapper {
 		dto.setCreatedBy(plan.getCreatedBy());
 		dto.setUpdatedBy(plan.getUpdatedBy());
 
-		return  dto;
+		return dto;
 	}
-	
+
 	public SubscriptionPlan toEntity(SubscriptionPlanDTO dto) {
-		if(dto==null) {
+		if (dto == null) {
 			return null;
 		}
-		SubscriptionPlan plan  = new SubscriptionPlan();
+		SubscriptionPlan plan = new SubscriptionPlan();
 		plan.setId(dto.getId());
 		plan.setPlanCode(dto.getPlanCode());
 		plan.setName(dto.getName());
@@ -53,68 +53,72 @@ public class SubscriptionPlanMapper {
 		plan.setIsActive(dto.getIsActive() != null ? dto.getIsActive() : true);
 		plan.setIsFeatured(dto.getIsFeatured() != null ? dto.getIsFeatured() : false);
 		plan.setBadgeText(dto.getBadgeText());
-		plan.setAdminNotes(dto.getAdminNote());		
+		plan.setAdminNotes(dto.getAdminNote());
 		plan.setCreatedBy(dto.getCreatedBy());
 		plan.setUpdatedBy(dto.getUpdatedBy());
-		
+
 		return plan;
 	}
-	
+
 	// Update entity from DTO
 	public void updateEntity(SubscriptionPlan plan, SubscriptionPlanDTO dto) {
-		if(plan == null || dto == null) {
-			return ;
+		if (plan == null || dto == null) {
+			return;
 		}
-		
-		// Don't update ID or planCode (immutable after creation) 
-		if(dto.getName() != null) {
+
+		// Don't update ID or planCode (immutable after creation)
+		if (dto.getName() != null) {
 			plan.setName(dto.getName());
 		}
-		
-		if(dto.getDescription() != null) {
+
+		if (dto.getDescription() != null) {
 			plan.setDescription(dto.getDescription());
 		}
-		
-		if(dto.getDurationDays() != null) {
+
+		if (dto.getDurationDays() != null) {
 			plan.setDurationDays(dto.getDurationDays());
 		}
 		
-		if(dto.getCurrency() != null) {
+		if(dto.getPrice() != null) {
+			plan.setPrice(dto.getPrice());
+		}
+
+		if (dto.getCurrency() != null) {
 			plan.setCurrency(dto.getCurrency());
 		}
-		
-		if(dto.getMaxBooksAllowed() != null) {
+
+		if (dto.getMaxBooksAllowed() != null) {
 			plan.setMaxBookAllowed(dto.getMaxBooksAllowed());
 		}
-		
-		if(dto.getMaxDaysPerBook() != null) {
+
+		if (dto.getMaxDaysPerBook() != null) {
 			plan.setMaxDaysPerBook(dto.getMaxDaysPerBook());
 		}
-		
-		if(dto.getDisplayOrder() != null) {
+
+		if (dto.getDisplayOrder() != null) {
 			plan.setDisplayOrder(dto.getDisplayOrder());
 		}
-		
-		if(dto.getIsActive() !=null) {
+
+		if (dto.getIsActive() != null) {
 			plan.setDisplayOrder(dto.getDisplayOrder());
 		}
-		
-		if(dto.getIsFeatured() != null) {
+
+		if (dto.getIsFeatured() != null) {
 			plan.setIsFeatured(dto.getIsFeatured());
 		}
-		
-		if(dto.getBadgeText() != null) {
+
+		if (dto.getBadgeText() != null) {
 			plan.setBadgeText(dto.getBadgeText());
 		}
-		
-		if(dto.getAdminNote() != null) {
+
+		if (dto.getAdminNote() != null) {
 			plan.setAdminNotes(dto.getAdminNote());
 		}
-		
-		if(dto.getUpdatedBy() != null) {
+
+		if (dto.getUpdatedBy() != null) {
 			plan.setUpdatedBy(dto.getUpdatedBy());
 		}
-		
+
 	}
 
 }

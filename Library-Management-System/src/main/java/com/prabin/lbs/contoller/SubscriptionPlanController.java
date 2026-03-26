@@ -1,4 +1,4 @@
-package com.prabin.lbs;
+package com.prabin.lbs.contoller;
 
 import java.util.List;
 
@@ -40,7 +40,7 @@ public class SubscriptionPlanController {
 	}
 
 	@PutMapping("admin/{id}")
-	public ResponseEntity<?> updateSubscriptionPlan(@Valid @RequestBody SubscriptionPlanDTO subscriptionPlanDTO,
+	public ResponseEntity<?> updateSubscriptionPlan(@RequestBody SubscriptionPlanDTO subscriptionPlanDTO,
 			@PathVariable long id) throws Exception {
 		SubscriptionPlanDTO plans = subscriptionPlanService.updateSubscriptionPlan(id, subscriptionPlanDTO);
 		return ResponseEntity.ok(plans);
